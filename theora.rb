@@ -1,6 +1,12 @@
 require 'rubygems'
 require 'json'
 
+count = lambda do |notes, sym|
+  notes.inject(0) do |sum, note|
+    sum + (note.include?(sym) ? 1 : 0)
+  end
+end
+
 scales = JSON.parse(open("scales.json").read)
 new_scales = {}
 
@@ -8,38 +14,34 @@ print "(s)cales, (n)otes, or (b)oth? "
 questions = STDIN.gets.strip
 
 loop do
-  scale = scales.keys[rand(scales.size)]
+  key = scales.keys[rand(scales.size)]
+  scale = scales[key]
 
   if questions == "s" || (questions == "b" && rand(5) == 0)
-    flats = scales[scale].inject(0) {|sum, note| sum + (note =~ /\wb/ ? 1 : 0) }
-    sharps = scales[scale].inject(0) {|sum, note| sum + (note =~ /\w#/ ? 1 : 0) }
+    flats, sharps = count[scale, "b"], count[scale, "#"]
 
-    scale_string = scales[scale] * " "
-    scale_string = "#{scale_string} (#{flats} flat#{"s" if flats > 1})" if flats > 0
-    scale_string = "#{scale_string} (#{sharps} sharp#{"s" if sharps > 1})" if sharps > 0
+    modifiers = if flats > 0
+      " (#{flats} flat#{ "s" if flats > 1 })"
+    elsif sharps > 0
+      " (#{sharps} sharp#{ "s" if sharps > 1 })"
+    end
 
-    print "#{scale} scale!"
+    print "#{key} scale!"
     STDIN.gets
-    puts scale_string
+
+    puts "#{scale * " "}#{modifiers}"
     print "Did you get it? (y/n) "
     response = STDIN.gets.strip
 
     if response == "y"
-      new_scales[scale] = scales.delete(scale)
-      if scales.empty?
-        scales = new_scales
-        new_scales = {}
-      end
+      new_scales[key] = scales.delete(key)
+      scales, new_scales = new_scales, {} if scales.empty?
     end
   else
     position = rand(7)
-    print "#{scale}, position #{position + 1}: "
+    print "#{key}, position #{position + 1}: "
     response = STDIN.gets.strip
 
-    if response == scales[scale][position]
-      puts "Right!"
-    else
-      puts "Wrong, #{scales[scale][position]}"
-    end
+    puts response == scale[position] ? "Right!" : "Wrong, #{scale[position]}"
   end
 end
