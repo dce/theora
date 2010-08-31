@@ -35,7 +35,11 @@ loop do
 
     if response == "y"
       new_scales[key] = scales.delete(key)
-      scales, new_scales = new_scales, {} if scales.empty?
+
+      if scales.empty?
+        puts "Got 'em all!"
+        scales, new_scales = new_scales, {}
+      end
     end
   else
     position = rand(7)
