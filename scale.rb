@@ -4,14 +4,24 @@ class Scale
   end
 
   def key_signature
-    { "sharp" => "#", "flat" => "b" }.each do |name, sym|
+    %w(# b).each do |sym|
       note_count = count(sym)
-      return [note_count, name] if note_count > 0
+      return "#{note_count}#{sym}" if note_count > 0
+    end
+
+    nil
+  end
+
+  def key_signature_string
+    if key_signature
+      names = { "#" => "sharp", "b" => "flat" }
+      note_count, sym = key_signature.split('')
+      " (#{ pluralize(note_count, names[sym]) })"
     end
   end
 
   def to_s
-    "#{ @notes * " " }#{ " (#{ pluralize(*key_signature) })" if key_signature }"
+    "#{ @notes * " " }#{ key_signature_string }"
   end
 
   def note(position)
