@@ -29,10 +29,10 @@ loop do
       end
     end
   else
-    position = rand(7)
-    print "#{key}, position #{position + 1}: "
+    position, note = scale.random_note
+    print "#{key}, position #{position}: "
     response = STDIN.gets.strip
 
-    puts response == scale[position] ? "Right!" : "Wrong, #{scale[position]}"
+    puts response == note ? "Right!" : "Wrong, #{note}"
   end
 end

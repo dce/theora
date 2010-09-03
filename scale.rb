@@ -14,6 +14,15 @@ class Scale
     "#{ @notes * " " }#{ " (#{ pluralize(*key_signature) })" if key_signature }"
   end
 
+  def note(position)
+    @notes[position - 1]
+  end
+
+  def random_note
+    position = rand(7) + 1
+    [position, note(position)]
+  end
+
   private
 
   def count(sym)
